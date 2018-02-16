@@ -107,6 +107,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   if not source == ""
     config.vm.synced_folder source, "/kong"
   end
+
   if not kong_deb_source == ""
     config.vm.synced_folder kong_deb_source, "/kong-deb"
   end
