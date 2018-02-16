@@ -26,6 +26,22 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     plugin_source = ""
   end
 
+  if File.directory?("./kong-plugin-acs")
+    acs_plugin_source = "./kong-plugin-acs"
+  elsif File.directory?("../kong-plugin-acs")
+    acs_plugin_source = "../kong-plugin-acs"
+  else
+    acs_plugin_source = ""
+  end
+
+  if File.directory?("./kong-deb")
+    kong_deb_source = "./kong-deb"
+  elsif File.directory?("../kong-deb")
+    kong_deb_source = "../kong-deb"
+  else
+    kong_deb_source = ""
+  end
+
   if ENV['KONG_VB_MEM']
     memory = ENV["KONG_VB_MEM"]
   else
@@ -86,13 +102,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    vb.cpus = cpus
   end
 
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "ubuntu/artful64"
 
   if not source == ""
     config.vm.synced_folder source, "/kong"
   end
+  if not kong_deb_source == ""
+    config.vm.synced_folder kong_deb_source, "/kong-deb"
+  end
+
   if not plugin_source == ""
     config.vm.synced_folder plugin_source, "/kong-plugin"
+  end
+
+  if not acs_plugin_source == ""
+    config.vm.synced_folder acs_plugin_source, "/kong-plugin-acs"
   end
 
   config.vm.network :forwarded_port, guest: 8000, host: 8000

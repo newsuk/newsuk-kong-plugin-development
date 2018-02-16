@@ -56,10 +56,10 @@ sudo apt-get install -y software-properties-common python-software-properties
 sudo add-apt-repository "deb https://apt.postgresql.org/pub/repos/apt/ precise-pgdg main"
 wget --quiet -O - https://postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - 
 sudo apt-get update
-sudo apt-get install -y postgresql-9.5
+sudo apt-get install -y postgresql-9.6
 
 # Configure Postgres
-sudo bash -c "cat > /etc/postgresql/9.5/main/pg_hba.conf" << EOL
+sudo bash -c "cat > /etc/postgresql/9.6/main/pg_hba.conf" << EOL
 local   all             all                                     trust
 host    all             all             127.0.0.1/32            trust
 host    all             all             ::1/128                 trust
@@ -105,17 +105,24 @@ sudo /etc/init.d/cassandra restart
 # Install Kong #
 ################
 echo Fetching and installing Kong...
-set +o errexit
-wget -q -O kong.deb "https://bintray.com/kong/kong-community-edition-deb/download_file?file_path=dists%2Fkong-community-edition-${KONG_VERSION}.trusty.all.deb"
-if [ ! $? -eq 0 ]
-then
-  # 0.10.3 and earlier are on Github
-  echo "failed downloading from BinTray, trying Github..."
-  set -o errexit
-  wget -q -O kong.deb https://github.com/Kong/kong/releases/download/$KONG_VERSION/kong-$KONG_VERSION.precise_all.deb
-fi
-set -o errexit
 
+if [ -d /kong-deb ]
+then
+  echo "Found local copy of kong.deb file..."
+  cp /kong-deb/kong.deb ./kong.deb
+else
+  set +o errexit
+  echo "Downloading kong.deb from BinTray..."
+  wget -q -O kong.deb "https://bintray.com/kong/kong-community-edition-deb/download_file?file_path=dists%2Fkong-community-edition-${KONG_VERSION}.zesty.all.deb"
+  if [ ! $? -eq 0 ]
+  then
+    # 0.10.3 and earlier are on Github
+    echo "Failed downloading from BinTray, trying Github..."
+    set -o errexit
+    wget -q -O kong.deb https://github.com/Kong/kong/releases/download/$KONG_VERSION/kong-$KONG_VERSION.precise_all.deb
+  fi
+  set -o errexit
+fi
 
 sudo apt-get update
 sudo apt-get install -y netcat openssl libpcre3 dnsmasq procps perl
