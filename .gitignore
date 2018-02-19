@@ -1,7 +1,14 @@
 # workdirectory
 .vagrant/
 
+# log files
+*.log
+
+# kong.deb cache
+kong-deb/
+
 # source code locations
 kong/
+kong-acs/
 kong-plugin/
-
+kong-plugin-acs/
